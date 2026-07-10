@@ -1,0 +1,13 @@
+;; Real-world organization location / contact.
+;; :head-role is institutional title only — no personal names.
+{:ooyake-id "gov.jpn.audit"
+  :official-url "https://www.jbaudit.go.jp/"
+  :name-en "Board of Audit"
+  :name-local "会計検査院"
+  :wikidata "Q615225"
+  :head-role "会計検査院長"
+  :head-role-note "institutional office title only; personal names of current office-holders are intentionally NOT stored"
+  :contact-page "https://www.wikidata.org/wiki/Q615225"
+  :sourced-from "com-etzhayyim-ooyake gov-units (verbatim where present)"
+  :hq {:line-en "Central Government Building No. 7" :country "jpn" :kind "headquarters" :provenance "https://www.wikidata.org/wiki/Q615225" :last-verified "2026-06-03" :sourcing "authoritative"}
+}
