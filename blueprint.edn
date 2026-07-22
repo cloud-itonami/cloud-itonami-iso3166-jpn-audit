@@ -10,4 +10,49 @@
  :itonami.blueprint/robotics false
  :itonami.blueprint/required-technologies [:identity :forms :dmn :bpmn :audit-ledger]
  :itonami.blueprint/status :public-oss
- :itonami.blueprint/organization {:ooyake-id "gov.jpn.audit" :official-url "https://www.jbaudit.go.jp/" :head-role "会計検査院長" :contact-page "https://www.wikidata.org/wiki/Q615225"}}
+ :itonami.blueprint/organization {:ooyake-id "gov.jpn.audit" :official-url "https://www.jbaudit.go.jp/" :head-role "会計検査院長" :contact-page "https://www.wikidata.org/wiki/Q615225"}
+ :itonami.blueprint/maturity :implemented
+ :itonami.blueprint/implemented-slice
+ "src/auditreadiness/* (langgraph-clj StateGraph actor): facts.cljc
+ (Board of Audit Act Article 22 mandatory-audit-scope + Article 23
+ discretionary-audit-scope + Articles 24-27 audit-cooperation-duties +
+ Act No. 179/1955 subsidy-record-retention catalog, grounded in
+ jbaudit.go.jp/japaneselawtranslation.go.jp/hourei.ndl.go.jp sources
+ only, plus a negative/boundary :no-separate-boa-vendor-qualification
+ entry defending against the fabricated-Board-of-Audit-specific-
+ vendor-qualification trap), registry.cljc (classify-audit-scope --
+ the flagship pure classification/routing function over an entity's
+ own ground-truth funding/ownership facts, deliberately NOT modeled as
+ a registration/application op, plus pure-function filing-draft/
+ filing-submit record construction), governor.cljc (Audit-Readiness
+ Compliance Governor -- spec-basis/no-fabrication HARD check,
+ audit-scope-classification HARD check (flagship, unconditional --
+ independently recomputes classify-audit-scope and holds on mismatch
+ or missing classification), cooperation-readiness-missing HARD check
+ (conditional on the entity being in-scope), subsidy-retention-
+ noncompliant HARD check (conditional on :subsidy-recipient?, checked
+ against the entity's own :program-retention-years, never a hardcoded
+ universal number), fabricated-boa-vendor-qualification HARD check
+ (negative/boundary defense), confidence-floor/actuation gate,
+ double-draft/double-submit guards), store.cljc (MemStore +
+ DatomicStore via kotoba-lang/langchain-store's entity field-spec
+ map->tx/pull->map/pull-pattern AND its identity-schema/event-log
+ helpers, engagement entity tracking the classification ground-truth
+ facts, cooperation-readiness flag, conditional subsidy-retention
+ fields, and the single actionable :audit-readiness-package filing
+ track's actuation state), auditreadinessllm.cljc (mock Compliance
+ Advisor), operation.cljc (intake -> advise -> govern -> decide ->
+ [request-approval ->] commit/hold StateGraph), phase.cljc (0->3
+ rollout, :filing/draft and :filing/submit permanently excluded from
+ every phase's :auto set). 39 tests / 121 assertions passing (governor
+ contract + store parity + facts + phase + registry), clj-kondo clean
+ (0 errors, 0 warnings). Domain reconciled against the pre-existing
+ (2026-07-10) blueprint text, which already correctly scoped this
+ actor to Board-of-Audit audit-readiness/record-keeping compliance
+ (not general Japan market entry) -- no scope pivot was needed, unlike
+ cloud-itonami-iso3166-jpn-mof/-moe; the implementation pass instead
+ made two framing points explicit (jurisdiction attaches
+ automatically by statute, never by application; :filing/draft and
+ :filing/submit name the operator's own compliance-package act, never
+ a submission the Board of Audit itself receives) -- see
+ docs/business-model.md's Domain note for the full reconciliation."}
