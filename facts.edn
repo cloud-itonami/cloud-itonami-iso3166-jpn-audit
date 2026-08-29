@@ -1,0 +1,260 @@
+;; Regulatory source register for JPN-AUDIT — the Board of Audit (会計検査院).
+;;
+;; README.md's core contract grounds the audit-readiness actor on the Board of
+;; Audit Act (会計検査院法) and the entity's own funding/ownership facts, and
+;; blueprint.edn names jbaudit.go.jp / japaneselawtranslation.go.jp /
+;; hourei.ndl.go.jp as the only allowed sources. Until this file existed there
+;; was no such list, so no claim in this repository could be traced to
+;; anything. This is that list.
+;;
+;; Shape is tx-data (a vector of entity maps), like every other EDN corpus in
+;; this workspace, so it loads with
+;;   (d/transact conn (edn/read-string (slurp "facts.edn")))
+;; :source/id is the join key. A law or page not in this table has NO
+;; spec-basis for this repository -- extend the table, never invent an id or a
+;; URL.
+;;
+;; VERIFIED BY `nbb scripts/verify-facts.cljs`, which re-fetches every entry.
+;; Each carries a :source/verify tag naming WHICH check establishes it:
+;;
+;;   :e-gov-law-id   Resolve the law id through the e-Gov law API and require
+;;                   the title and the law number to still match. HTTP status
+;;                   is never consulted here and must not be:
+;;                   laws.e-gov.go.jp answers HTTP 200 for /law/<anything>,
+;;                   renders "not found" client-side, and therefore cannot
+;;                   tell a real citation from an invented one.
+;;
+;;   :page-identity  Fetch and require four things together: a 2xx, a final
+;;                   URL that is still the page asked for, the declared
+;;                   charset, and the <title> recorded below.
+;;
+;;   :page-text      All of :page-identity, plus every string in
+;;                   :page/must-contain present in the de-tagged body.
+;;
+;; THE HOST ASSUMPTIONS ARE MEASURED AT RUN TIME, NOT DATED IN A COMMENT.
+;; The :host-behaviour entities below say what each host does with a path that
+;; does not exist. The verifier fetches a nonexistent path on every host in
+;; the register and fails if the answer has changed. A dated note degrades
+;; into a constant the moment it is written; a declaration the run re-measures
+;; cannot.
+;;
+;; THE TWO MEASUREMENTS THAT SHAPE THIS REGISTER (both re-measured every run):
+;;
+;; 1. www.jbaudit.go.jp answers **404** -- not 403, not a redirect -- for a
+;;    path that does not exist, and the 404 page is a SOFT 404: 15471 bytes of
+;;    real site chrome whose <title> is the SITE title ("会計検査院 Board of
+;;    Audit of Japan"), identical to the front page's title. On this host a
+;;    title alone separates nothing; only the status does. 404 is not 2xx, so
+;;    the :page-identity status check still discriminates -- but a checker
+;;    written to look for 403 (the refusal the sibling METI hosts give) would
+;;    misread this host as blocked. The status is pinned in
+;;    :host/missing-status and compared on every run.
+;;
+;; 2. www.jbaudit.go.jp does NOT redirect http:// to https://: the http form
+;;    of a real page answers 404 at the http URL. The redirect self-test in
+;;    verify-facts.cljs is therefore aimed at the OTHER host in the register
+;;    (www.japaneselawtranslation.go.jp, which does redirect), and the
+;;    self-test walks the pool and requires SOME host to demonstrate the
+;;    redirect branch rather than assuming every host behaves the same.
+;;
+;; Claims stop at the level actually checked -- law identity via the API, and
+;; for the pages the title, the URL, the charset and the strings read on
+;; 2026-08-30. No article text and no PDF is asserted, because none was read.
+
+[
+ ;; ── What each host does with a path that does not exist ────────────────────
+ ;; Re-measured on every run. A change here invalidates the check that rests
+ ;; on it, which is the point of writing it down as data.
+
+ {:source/id "host.www-jbaudit-go-jp"
+  :source/kind :host-behaviour
+  :host/name "www.jbaudit.go.jp"
+  :host/missing-path :refuses
+  :host/missing-status 404
+  :source/note "会計検査院 itself. A nonexistent path answers 404 with a
+                15471-byte soft-404 page served at the requested URL, whose
+                <title> is the SITE title -- identical to the front page's
+                title, so on this host the title separates nothing and the
+                status is the only discriminator. Also measured: the host does
+                NOT redirect http:// to https:// -- the http form of a real
+                page answers 404 at the http URL. No challenge has been
+                observed on this host; if one appears, this entity is the
+                first thing to re-measure."}
+
+ {:source/id "host.www-japaneselawtranslation-go-jp"
+  :source/kind :host-behaviour
+  :host/name "www.japaneselawtranslation.go.jp"
+  :host/missing-path :refuses
+  :host/missing-status 404
+  :source/note "法務省の日本法令外国語訳DB (Ministry of Justice Japanese Law
+                Translation database). A nonexistent path answers 404 with a
+                short \"Error - Japanese Law Translation\" page -- unlike the
+                Board of Audit host, the title DOES separate the error page
+                from real pages here. This host DOES redirect http:// to
+                https://, which is what the verifier's redirect self-test
+                exercises. The translation is explicitly NOT an official
+                text; this register cites it as the Ministry of Justice's
+                published English rendering of the statute, never as the
+                statute itself."}
+
+ ;; ── Statutes ───────────────────────────────────────────────────────────────
+
+ {:source/id "law.audit-act"
+  :source/kind :statute
+  :source/title "会計検査院法"
+  :source/publisher "e-Gov 法令検索 (Digital Agency)"
+  :source/url "https://laws.e-gov.go.jp/law/322AC0000000073"
+  :source/verify :e-gov-law-id
+  :egov/law-id "322AC0000000073"
+  :egov/law-title "会計検査院法"
+  :egov/law-num "昭和二十二年法律第七十三号"
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:agency-mandate :audit-scope :audit-cooperation-duties}
+  :source/note "The Board of Audit Act -- the statute Articles 22/23 of which
+                define the mandatory and discretionary audit scope this
+                actor's classify-audit-scope routes on. The law id is the one
+                the Board's own 関係法令 page links to (the plausible-looking
+                322AC0000000148 is 貨幣損傷等取締法 -- a wrong-id guess passes
+                an HTTP check and fails only here). Article text not read;
+                this entry establishes that the Act exists and is identified
+                correctly, nothing further."}
+
+ {:source/id "law.audit-act-enforcement-rule"
+  :source/kind :statute
+  :source/title "会計検査院法施行規則"
+  :source/publisher "e-Gov 法令検索 (Digital Agency)"
+  :source/url "https://laws.e-gov.go.jp/law/322R00000001004"
+  :source/verify :e-gov-law-id
+  :egov/law-id "322R00000001004"
+  :egov/law-title "会計検査院法施行規則"
+  :egov/law-num "昭和二十二年会計検査院規則第四号"
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:audit-procedure}
+  :source/note "Board of Audit rule enforcing the Act. Cited at law-identity
+                level only."}
+
+ {:source/id "law.audit-bureau-assignment-rule"
+  :source/kind :statute
+  :source/title "会計検査院事務総局事務分掌及び分課規則"
+  :source/publisher "e-Gov 法令検索 (Digital Agency)"
+  :source/url "https://laws.e-gov.go.jp/law/322R00000001003"
+  :source/verify :e-gov-law-id
+  :egov/law-id "322R00000001003"
+  :egov/law-title "会計検査院事務総局事務分掌及び分課規則"
+  :egov/law-num "昭和二十二年会計検査院規則第三号"
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:agency-organisation}
+  :source/note "Rule assigning the Secretariat's business divisions. Cited at
+                law-identity level only."}
+
+ {:source/id "law.public-accounting-act"
+  :source/kind :statute
+  :source/title "会計法"
+  :source/publisher "e-Gov 法令検索 (Digital Agency)"
+  :source/url "https://laws.e-gov.go.jp/law/322AC0000000035"
+  :source/verify :e-gov-law-id
+  :egov/law-id "322AC0000000035"
+  :egov/law-title "会計法"
+  :egov/law-num "昭和二十二年法律第三十五号"
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:public-finance-procedure}
+  :source/note "The Public Accounts Act -- the expenditure/receipt procedure
+                whose records a public-sector contractor must keep in a shape
+                the Board of Audit can inspect. Cited at law-identity level
+                only."}
+
+ ;; ── The Board's own pages ──────────────────────────────────────────────────
+
+ {:source/id "jbaudit.law-page"
+  :source/kind :page
+  :source/title "関係法令 page"
+  :source/publisher "会計検査院 (Board of Audit)"
+  :source/url "https://www.jbaudit.go.jp/jbaudit/law/index.html"
+  :source/verify :page-text
+  :page/title "関係法令 | 組織の紹介 | 会計検査院 Board of Audit of Japan"
+  :page/must-contain ["関係法令" "会計検査院法" "会計検査院法施行規則"]
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:agency-mandate :audit-procedure}
+  :source/note "The Board's own list of the laws and rules it administers --
+                the page that ties law.audit-act and the two 規則 entries to
+                the agency. Strings present in the de-tagged body as read on
+                2026-08-30."}
+
+ {:source/id "jbaudit.position"
+  :source/kind :page
+  :source/title "会計検査院とは page"
+  :source/publisher "会計検査院 (Board of Audit)"
+  :source/url "https://www.jbaudit.go.jp/jbaudit/position.html"
+  :source/verify :page-text
+  :page/title "会計検査院とは | 組織の紹介 | 会計検査院 Board of Audit of Japan"
+  :page/must-contain ["会計検査院とは" "憲法" "独立"]
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:agency-mandate}
+  :source/note "The Board's own statement of what it is -- its constitutional
+                independence from the cabinet (the framing this actor's
+                jurisdiction-attaches-by-statute rule rests on). Strings
+                present in the de-tagged body as read on 2026-08-30."}
+
+ {:source/id "jbaudit.report"
+  :source/kind :page
+  :source/title "検査結果 page"
+  :source/publisher "会計検査院 (Board of Audit)"
+  :source/url "https://www.jbaudit.go.jp/report/index.html"
+  :source/verify :page-identity
+  :page/title "検査結果 | 会計検査院 Board of Audit of Japan"
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:audit-findings}
+  :source/note "Entry point for the 決算検査報告 (annual certification of
+                final accounts) and 随時検査 findings. Title and URL checked;
+                the report PDFs themselves are not asserted."}
+
+ ;; ── The Ministry of Justice translation ────────────────────────────────────
+
+ {:source/id "jlt.audit-act-en"
+  :source/kind :page
+  :source/title "The Board of Audit Act - English"
+  :source/publisher "法務省 Japanese Law Translation (Ministry of Justice)"
+  :source/url "https://www.japaneselawtranslation.go.jp/en/laws/view/4073/en"
+  :source/verify :page-identity
+  :page/title "The Board of Audit Act - English - Japanese Law Translation"
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:agency-mandate :audit-scope :english-reference}
+  :source/note "The Ministry of Justice's published English rendering of the
+                Board of Audit Act -- the readable surface an English-speaking
+                operator reads Articles 22/23 through. The site states these
+                translations are NOT official texts; the Japanese statute
+                cited above remains the authority, and this entry never
+                outranks it."}
+
+ {:source/id "jlt.home"
+  :source/kind :page
+  :source/title "TOP - Japanese Law Translation"
+  :source/publisher "法務省 Japanese Law Translation (Ministry of Justice)"
+  :source/url "https://www.japaneselawtranslation.go.jp/en"
+  :source/verify :page-identity
+  :page/title "TOP - Japanese Law Translation"
+  :source/retrieved-at "2026-08-30"
+  :source/covers #{:translation-db-notice}
+  :source/note "The database's own front page, which carries the NOTICE TO
+                USERS this register relies on: the translations are NOT
+                official texts. Cited at page-identity level so the notice's
+                host is pinned; the notice text itself is not asserted."}
+
+ ;; ── Coverage ───────────────────────────────────────────────────────────────
+
+ {:source/kind :coverage
+  :coverage/entries 9
+  :coverage/by-verify {:e-gov-law-id 4 :page-identity 3 :page-text 2}
+  :coverage/not-covered
+  ["No article text of any statute is asserted -- every law entry establishes
+    identity, not content."
+   "The 決算検査報告 PDFs themselves are not cited; only the 検査結果 entry
+    page is."
+   "hourei.ndl.go.jp (named in blueprint.edn as an allowed source) was not
+    cited: the Board's 関係法令 page carries no NDL links, and no page on that
+    host was read this run. Not-cited is not absent."
+   "www.jbaudit.go.jp serves some pages only via PDF (e.g. 検査基準); PDF
+    content is never asserted by this register."]
+  :coverage/notes
+  ["Every URL in this file was fetched by the run that wrote it on
+    2026-08-30, and is re-fetched by scripts/verify-facts.cljs on every run."]}]
