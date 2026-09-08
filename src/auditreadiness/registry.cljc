@@ -33,7 +33,7 @@
   itself -- the Board never receives applications; it examines by
   statute (see `auditreadiness.operation`'s `:filing/submit`, always
   human-gated -- see README Core Contract)."
-  (:require [clojure.string :as str]))
+  (:require [kotoba.lang.text :as str]))
 
 (def audit-readiness-track
   "The single actionable filing track this actor drafts/submits records
@@ -62,7 +62,7 @@
     (str (apply str (repeat (max 0 (- w (count s))) "0")) s)))
 
 (defn- track-code [track]
-  (str/upper-case (name track)))
+  (str/upper (name track)))
 
 (defn classify-audit-scope
   "The flagship classification: does `entity`'s OWN ground-truth facts
