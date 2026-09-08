@@ -163,7 +163,25 @@
                 the Board of Audit can inspect. Cited at law-identity level
                 only."}
 
- ;; ── The Board's own pages ──────────────────────────────────────────────────
+ {:source/id "law.public-finance-act"
+  :source/kind :statute
+  :source/title "財政法"
+  :source/publisher "e-Gov 法令検索 (Digital Agency)"
+  :source/url "https://laws.e-gov.go.jp/law/322AC0000000034"
+  :source/verify :e-gov-law-id
+  :egov/law-id "322AC0000000034"
+  :egov/law-title "財政法"
+  :egov/law-num "昭和二十二年法律第三十四号"
+  :source/retrieved-at "2026-09-08"
+  :source/covers #{:public-finance-procedure}
+  :source/note "The Public Finance Act -- the budget-authorising frame that 会計法's
+                expenditure/receipt procedure sits inside and that the Board audits
+                against, so the two are read together. Resolved through the e-Gov
+                law API on 2026-09-08 (total_count 1). Identity only; no article
+                text is asserted."
+}
+
+;; ── The Board's own pages ──────────────────────────────────────────────────
 
  {:source/id "jbaudit.law-page"
   :source/kind :page
@@ -243,8 +261,8 @@
  ;; ── Coverage ───────────────────────────────────────────────────────────────
 
  {:source/kind :coverage
-  :coverage/entries 9
-  :coverage/by-verify {:e-gov-law-id 4 :page-identity 3 :page-text 2}
+  :coverage/entries 10
+  :coverage/by-verify {:e-gov-law-id 5 :page-identity 3 :page-text 2}
   :coverage/not-covered
   ["No article text of any statute is asserted -- every law entry establishes
     identity, not content."
