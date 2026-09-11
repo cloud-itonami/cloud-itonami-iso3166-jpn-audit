@@ -110,7 +110,7 @@ applies to / registers with the Board of Audit":
 1. Coming under Board of Audit jurisdiction is never something an
    entity applies for — it attaches automatically by statute (Article
    22/23 criteria) to any entity whose own funding/ownership/contract
-   facts meet them. `src/auditreadiness/registry.cljc`'s
+   facts meet them. `src/auditreadiness/registry.cljk`'s
    `classify-audit-scope` is accordingly a pure CLASSIFICATION function
    over the entity's own facts, never a registration/application op.
 2. `:filing/draft`/`:filing/submit` name the operator's OWN act of
