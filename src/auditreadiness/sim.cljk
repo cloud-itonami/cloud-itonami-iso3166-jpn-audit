@@ -1,5 +1,5 @@
 (ns auditreadiness.sim
-  "Demo driver -- `clojure -M:dev:run`. Walks a clean mandatory-scope
+  "Demo driver -- `kbb -M:dev:run`. Walks a clean mandatory-scope
   engagement through intake -> assess mandatory-audit-scope -> assess
   audit-cooperation-duties -> audit-readiness compliance-package filing
   draft (escalate/approve/commit) -> filing submit (escalate/approve/
