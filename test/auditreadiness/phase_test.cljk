@@ -1,5 +1,5 @@
 (ns auditreadiness.phase-test
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [auditreadiness.phase :as phase]))
 
 (deftest filing-submit-never-auto
