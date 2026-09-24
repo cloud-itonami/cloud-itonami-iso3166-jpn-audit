@@ -1,5 +1,5 @@
 (ns auditreadiness.facts-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [auditreadiness.facts :as facts]))
 
 (deftest mandatory-audit-scope-has-spec-basis
